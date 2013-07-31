@@ -35,7 +35,8 @@ JOBAD.repo.config({
 			"test.hover", 
 			"test.menu1", 
 			"test.menu2", 
-			"test.sidebar"
+			"test.sidebar",
+			"math.satree"
 	],
 	"at": {
 			/*
@@ -51,7 +52,8 @@ JOBAD.repo.config({
 			"test.hover": "core/test/test.hover.js",
 			"test.menu1": "core/test/test.menu1.js",
 			"test.menu2": "core/test/test.menu2.js",
-			"test.sidebar": "core/test/test.sidebar.js"
+			"test.sidebar": "core/test/test.sidebar.js",
+			"math.satree": "satree/satree.min.js"
 			
 	},
 	"versions": ["3.1.6", "3.1.7", "3.1.8"], //compatible JOBAD versions
