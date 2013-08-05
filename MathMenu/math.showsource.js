@@ -11,15 +11,12 @@
       'description':  'Simply displays the TeX source of MathML formulas',
     },
     contextMenuEntries: function(target){
-      if(target.is('#nomenu,#nomenu *')){ //no menu for these elements
-        return false;
-      }
       var math = target.closest('math');
       if (! math.is('math')) { return false;}
       return [
         ["Display TeX", function(element){
-          var txt = math.find('annotation[encoding="application/x-tex"]').text();
-          alert(txt);
+          var tex = math.find('annotation[encoding="application/x-tex"]').text();
+          alert(tex);
         }]
       ];
     }
