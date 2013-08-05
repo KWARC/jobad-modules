@@ -1,7 +1,7 @@
 /*
 	JOBAD v3
 	Development version
-	built: Mon, 05 Aug 2013 17:45:28 +0200
+	built: Mon, 05 Aug 2013 21:51:08 +0200
 
 	
 	Copyright (C) 2013 KWARC Group <kwarc.info>
@@ -4372,7 +4372,7 @@ JOBAD.UI.ContextMenu.enable = function(element, demandFunction, config){
 		JOBAD.UI.ContextMenu.clear(config.parents);
 		
 		//we are empty => allow browser to handle stuff
-		if(!result){
+		if(result.length == 0 || !result){
 			onEmpty(orgElement); 
 			return !block; 
 		}
