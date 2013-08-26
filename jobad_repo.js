@@ -36,7 +36,10 @@ JOBAD.repo.config({
 			"test.menu1", 
 			"test.menu2", 
 			"test.sidebar",
-			"math.satree"
+			"math.satree",
+			"math.clipboard",
+			"math.showsource",
+			"math.wolframalpha"
 	],
 	"at": {
 			/*
@@ -53,10 +56,12 @@ JOBAD.repo.config({
 			"test.menu1": "core/test/test.menu1.js",
 			"test.menu2": "core/test/test.menu2.js",
 			"test.sidebar": "core/test/test.sidebar.js",
-			"math.satree": "satree/satree.min.js"
-			
+			"math.satree": "satree/satree.min.js",
+			"math.clipboard":"MathMenu/math.clipboard.js",
+			"math.showsource":"MathMenu/math.showsource.js",
+			"math.wolframalpha":"MathMenu/math.wolframalpha.js",
 	},
-	"versions": ["3.1.6", "3.1.7", "3.1.8"], //compatible JOBAD versions
+	"versions": ["3.1.7", "3.1.8", "3.1.9"], //compatible JOBAD versions
 	"name": "Official JOBAD Modules Repository", //name
 	"description": "The official JOBAD Modules repository" //description
 });
