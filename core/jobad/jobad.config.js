@@ -26,7 +26,7 @@
 			'author':	'Tom Wiesing',
 			'description':	'This module provides a simple configuration dialog. For backwards compatibility, this module adds the .showConfigUI() function to modules. ',
 			'hasCleanNamespace': false,
-			'version': '3.1.7'
+			'version': '3.1.9'
 		},
 		globalinit: function(){
 			//icon source: http://openiconlibrary.sourceforge.net/gallery2/?./Icons/actions/configure-5.png, license: gplv2
@@ -47,7 +47,7 @@
 			return [
 				["Show Config UI", function(element){
 					me.showConfigUI();
-				}, "jobad.icons.config"]
+				}, "jobad.icons.config", {"id": "awesome"}]
 			];
 		},
 		/* builds a jQuery Config Item */
@@ -249,25 +249,47 @@
 								e.remove();
 							}
 					});
+
+					var $button = JOBAD.refs.$('<button type="button" class="btn">').text("Focus");
+
+					$button.click(function(e){
+						if(me.Instance.isFocused()){
+							me.Instance.unfocus(); 
+							$button.removeClass("active"); 
+						} else {
+							me.Instance.focus(); 
+							$button.addClass("active"); 
+						}
+					});
+
+					if(me.Instance.isFocused()){
+						$button.addClass("active"); 
+					}
 				
 					tab.empty()
 					.append(
 						JOBAD.util.createTabs(
-							["About JOBAD", "Config", "GPL License", "jQuery", "jQuery UI", "Underscore"], 
+							["Instance", "About JOBAD", "GPL License", "jQuery", "Bootstrap", "Underscore"], 
 							[
+								JOBAD.refs.$("<div>").append(
+									JOBAD.refs.$("<span>").text("Instance ID: "+me.ID),
+									"<br />",
+									$button,
+									"<h4>Configuration</h4>",
+									$config
+								), 
 								JOBAD.refs.$("<div>").append(
 									JOBAD.refs.$("<span>").text("JOBAD Core Version "+JOBAD.version),
 									JOBAD.refs.$("<pre>").text(JOBAD.resources.getTextResource("jobad_license"))
 								),
-								$config,
 								JOBAD.refs.$("<pre>").text(JOBAD.resources.getTextResource("gpl_v3_text")),
 								JOBAD.refs.$("<div>").append(
 									JOBAD.refs.$("<span>").text("jQuery Version "+JOBAD.refs.$.fn.jquery),
 									JOBAD.refs.$("<pre>").text(JOBAD.resources.getTextResource("jquery_license"))
 								),
 								JOBAD.refs.$("<div>").append(
-									JOBAD.refs.$("<span>").text("jQuery UI Version "+JOBAD.refs.$.ui.version),
-									JOBAD.refs.$("<pre>").text(JOBAD.resources.getTextResource("jqueryui_license"))
+									JOBAD.refs.$("<span>").text("Bootstrap Version 2.3.2"),
+									JOBAD.refs.$("<pre>").text(JOBAD.resources.getTextResource("bootstrap_license"))
 								),
 								JOBAD.refs.$("<div>").append(
 									JOBAD.refs.$("<span>").text("Underscore Version "+JOBAD.util.VERSION),
@@ -328,13 +350,49 @@
 							}
 						}
 					});
+
+					//Sidebar onOff 
+
+					var TBButton = JOBAD.util.createRadio(["Hide", "Show"], mod.Toolbar.isVisible()?1:0);
+
+					var UpButton = JOBAD.refs.$('<button type="button" class="btn">').button().text("Up").click(function(){
+						mod.Toolbar.moveUp(); 
+					});
+
+					var DownButton = JOBAD.refs.$('<button type="button" class="btn">').text("Down").click(function(){
+						mod.Toolbar.moveDown(); 
+					});
+
+					TBButton.find("input").change(function(){
+						if(TBButton.find("input").eq(1).is(":checked")){
+							mod.Toolbar.setVisible(); 
+							UpButton.show(); 
+							DownButton.show(); 
+						} else {
+							mod.Toolbar.setHidden(); 
+							UpButton.hide(); 
+							DownButton.hide(); 
+						}
+					}).change();
+
+					
+
 					
 					$info.append(
 						"by ",
 						JOBAD.refs.$("<span>").css("text-decoration", "italic").text(info.author),
 						"<br />",
 						OnOff,
-						"<br />")
+						"<br />",
+						"Toolbar: ",
+						TBButton,
+						JOBAD.refs.$("<div class='btn-group'>").append(
+							DownButton, 
+							UpButton
+						),
+						"<br />"
+					);
+
 					if(typeof info.url == "string"){
 						$info.append(
 							JOBAD.refs.$("<a>").text(info.url).attr("href", info.url).attr("target", "_blank").button(),
