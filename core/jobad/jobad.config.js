@@ -26,7 +26,7 @@
 			'author':	'Tom Wiesing',
 			'description':	'This module provides a simple configuration dialog. For backwards compatibility, this module adds the .showConfigUI() function to modules. ',
 			'hasCleanNamespace': false,
-			'version': '3.1.9'
+			'version': '3.2.0'
 		},
 		globalinit: function(){
 			//icon source: http://openiconlibrary.sourceforge.net/gallery2/?./Icons/actions/configure-5.png, license: gplv2
@@ -250,20 +250,37 @@
 							}
 					});
 
-					var $button = JOBAD.refs.$('<button type="button" class="btn">').text("Focus");
-
-					$button.click(function(e){
+					var $focusButton = 
+					JOBAD.refs.$('<button type="button" class="btn">')
+					.text("Focus")
+					.click(function(e){
 						if(me.Instance.isFocused()){
 							me.Instance.unfocus(); 
-							$button.removeClass("active"); 
+							$focusButton.removeClass("active"); 
 						} else {
 							me.Instance.focus(); 
-							$button.addClass("active"); 
+							$focusButton.addClass("active"); 
 						}
 					});
 
 					if(me.Instance.isFocused()){
-						$button.addClass("active"); 
+						$focusButton.addClass("active"); 
+					}
+
+					var $autoButton = 
+					JOBAD.refs.$('<button type="button" class="btn">')
+					.text("Auto").click(function(e){
+						if(me.Instance.isAutoFocusEnabled()){
+							me.Instance.disableAutoFocus(); 
+							$autoButton.removeClass("active"); 
+						} else {
+							me.Instance.enableAutoFocus(); 
+							$autoButton.addClass("active"); 
+						}
+					});
+
+					if(me.Instance.isAutoFocusEnabled()){
+						$autoButton.addClass("active"); 
 					}
 				
 					tab.empty()
@@ -274,7 +291,8 @@
 								JOBAD.refs.$("<div>").append(
 									JOBAD.refs.$("<span>").text("Instance ID: "+me.ID),
 									"<br />",
-									$button,
+									$focusButton,
+									$autoButton, 
 									"<h4>Configuration</h4>",
 									$config
 								), 
@@ -435,7 +453,7 @@
 					return;
 				};
 
-				var displayDiv = JOBAD.refs.$("<div>").addClass("modal hide fade large"); 
+				var displayDiv = JOBAD.refs.$("<div>").addClass("modal hide large"); 
 				var header = JOBAD.refs.$("<div>").addClass("modal-header")
 				.append(
 					'<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>',
@@ -460,12 +478,16 @@
 						}
 					}).addClass("modal-body"), 
 					footer
-				).appendTo("body")
+				).appendTo($("<div>").BS().appendTo("body"))
 				.modal()
 				.on("hidden", function(){
 					EventHandler.trigger("JOBAD.modInfoClose"); 
-					displayDiv.remove(); //We don't need it anymore
-				}); 
+
+					displayDiv.parent().remove(); //We don't need it anymore
+					JOBAD.UI.BSStyle(); //Call the Bootstrap Cleanup function
+				});
+
+				JOBAD.UI.BSStyle(); 
 			}
 	});
 })(JOBAD.refs.$);

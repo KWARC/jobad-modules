@@ -61,7 +61,7 @@ JOBAD.repo.config({
 			"math.showsource":"MathMenu/math.showsource.js",
 			"math.wolframalpha":"MathMenu/math.wolframalpha.js",
 	},
-	"versions": ["3.1.7", "3.1.8", "3.1.9"], //compatible JOBAD versions
+	"versions": ["3.1.8", "3.1.9", "3.2.0"], //compatible JOBAD versions
 	"name": "Official JOBAD Modules Repository", //name
 	"description": "The official JOBAD Modules repository" //description
 });

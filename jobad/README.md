@@ -1,1 +1,1 @@
-This directory contains the latest JOBAD Stable release (3.1.9)
+This directory contains the latest JOBAD Stable release (3.2.0)
