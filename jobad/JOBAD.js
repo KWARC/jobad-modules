@@ -1,7 +1,7 @@
 /*
 	JOBAD v3
 	Development version
-	built: Thu, 26 Sep 2013 03:45:23 +0200
+	built: Fri, 27 Sep 2013 11:20:08 +0200
 
 	
 	Copyright (C) 2013 KWARC Group <kwarc.info>
@@ -7755,9 +7755,9 @@ JOBAD.events.configUpdate =
 		'enable': function(root){
 			var me = this;
 			JOBAD.refs.$("body").on('JOBAD.ConfigUpdateEvent', function(jqe, setting, moduleId){
-				preEvent(me, "configUpdate", [setting, module]);
+				preEvent(me, "configUpdate", [setting, moduleId]);
 				me.Event.configUpdate.trigger(setting, moduleId);
-				postEvent(me, "configUpdate", [setting, module]);
+				postEvent(me, "configUpdate", [setting, moduleId]);
 			});
 		},
 		'disable': function(root){
