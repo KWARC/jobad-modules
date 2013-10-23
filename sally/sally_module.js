@@ -5,6 +5,7 @@
         return function (_message) {
             var message = unserialize(_message);
             var menus = {};
+            console.log(message);
 
             for (var i=0; i<message.frames.length; i++) {
                 var frame = message.frames[i];
@@ -16,7 +17,7 @@
                         var choice = new sally.SallyFrameChoice;
                         choice.choiceId = service.id;
                         choice.callbackToken = message.callbackToken;
-                        choice.fileName = fileName;
+                        choice.fileName = message.fileName;
                         $.cometd.publish("/service/theo/choice", serialize(choice));
                     }
                 }
