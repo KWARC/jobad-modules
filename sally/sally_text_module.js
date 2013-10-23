@@ -1,4 +1,24 @@
 (function($){
+  function selPart(docName, root) {
+    return function(_message) {
+      var message = unserialize(_message);
+      if (message.fileName != docName)
+        return;
+      $(root).find("span").each(function(idx, obj) {
+        var partid = $(this).data("partid");
+        if (partid == message.id) {
+          $(root).find(".text-sel").each(function(idx, obj) {
+            $(obj).removeClass("text-sel");
+          });
+          $(obj).addClass("text-sel");
+          $('html, body').animate({
+            scrollTop: $(obj).offset().top
+          });
+        }
+      });
+    }
+  }
+
       function createDoc(root, docName) {
         var asm = new sally.HTMLASM
 		$(root).find("span").each(function(idx, obj) {
@@ -41,8 +61,11 @@
         var asmdata = new sally.AlexData
         asmdata.fileName = docName;
         asmdata.data = JSON.stringify(serialize(asm));
-        $.cometd.publish("/service/sketch", serialize(asmdata));
-		}
+        $.cometd.batch(function () {
+            $.cometd.subscribe("/html/htmlSelectPart", selPart(docName, root));
+            $.cometd.publish("/service/sketch", serialize(asmdata));
+        });
+	}
 
 	    JOBAD.modules.register({
         info:{
@@ -53,17 +76,13 @@
             'hasCleanNamespace': false,
         },
         init: function(JOBADInstance, url, doc){
-        	this.setHandler("sally_connect", "sally_connect");
+            JOBADInstance.Event.on("sally_connect", this.sally_connect);
         },
 
-        onEvent: function(evt, elmn, JOBADInstance) {
-        	if (evt != "sally_connect")
-        		return;
-            createDoc(JOBADInstance.element, "sketch1.doc-txt");
-        },
-
-        sally_connect: function(JOBADInstance) {
-        	console.log("initing images ");
+        sally_connect: function(params) {
+            var JOBADInstance = params.instance;
+            var doc = params.doc;
+            createDoc(JOBADInstance.element, doc+"-txt");
         }
        });
 })(JOBAD.refs.$);

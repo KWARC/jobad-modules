@@ -1,36 +1,39 @@
 (function($){
     var _connected = false;
 
-    var letUserChoose = function(fileName) {
-        return function (_message) {
-            var message = unserialize(_message);
-            var menus = {};
-            console.log(message);
+    var letUserChoose = function (_message) {
+        var message = unserialize(_message);
+        var menus = {};
 
-            for (var i=0; i<message.frames.length; i++) {
-                var frame = message.frames[i];
-                var frameName = frame.frameName; 
-                menus[frameName] = {};
-                for (var j=0; j<frame.frameServices.length; ++j) {
-                    var service = frame.frameServices[j];
-                    menus[frameName][service.name] = function() {
-                        var choice = new sally.SallyFrameChoice;
-                        choice.choiceId = service.id;
-                        choice.callbackToken = message.callbackToken;
-                        choice.fileName = message.fileName;
-                        $.cometd.publish("/service/theo/choice", serialize(choice));
-                    }
-                }
+        function execService(service) {
+            return function() {
+                var choice = new sally.SallyFrameChoice;
+                choice.choiceId = service.id;
+                choice.callbackToken = message.callbackToken;
+                choice.fileName = message.fileName;
+                $.cometd.publish("/service/theo/choice", serialize(choice));
             }
-
-            JOBAD.UI.ContextMenu.enable($("#wheel"), function() {
-                return menus;
-            }, {});
-            setTimeout(function() {
-                $("#wheel").trigger("contextmenu.JOBAD.UI.ContextMenu");
-            }, 100);
         }
-    };
+
+        for (var i=0; i<message.frames.length; i++) {
+            var frame = message.frames[i];
+            var frameName = frame.frameName; 
+            menus[frameName] = {};
+            for (var j=0; j<frame.frameServices.length; ++j) {
+                var service = frame.frameServices[j];
+                var servFun = execService(service);
+                menus[frameName][service.name] = servFun;
+            }
+        }
+
+        JOBAD.UI.ContextMenu.enable($("#wheel"), function() {
+            return menus;
+        }, {});
+        setTimeout(function() {
+            $("#wheel").trigger("contextmenu.JOBAD.UI.ContextMenu");
+        }, 100);
+    }
+
 
     var newWindow = function(fileName) {
         return function (_message) {
@@ -38,6 +41,7 @@
             var frame = $("<iframe>").attr("src", message.url).attr("style", "width: 100%; height: 100%;");
             var divStyle = $("<div>").attr("style", "width: 100%; height: 100%;").append(frame);
             $(divStyle).dialog({
+                title: message.title,
                 position: {
                     "using" : function() {
                         $(this).css("top", message.position.y).css("left", message.position.x); 
@@ -49,7 +53,6 @@
                     $(divStyle).empty();
                 }
             });
-            console.log(message.url);
         };
     };
 
@@ -59,7 +62,7 @@
         return function _metaHandshake(handshake) {
             if (handshake.successful === true) {
                 $.cometd.batch(function () {
-                    $.cometd.subscribe('/theo/letuserchoose', letUserChoose(doc, JOBADInstance));
+                    $.cometd.subscribe('/theo/letuserchoose', letUserChoose);
                     $.cometd.subscribe('/theo/newWindow', newWindow(doc));
 
                     var whoami = new sally.WhoAmI;
@@ -67,8 +70,8 @@
                     whoami.environmentType = sally.WhoAmI.EnvironmentType.Web;
                     whoami.documentType = sally.WhoAmI.DocType.Sketch;
                     $.cometd.publish('/service/theo/register', serialize(whoami));
-
-                    JOBADInstance.Event.handle("sally_connect", [doc]);
+        
+                    JOBADInstance.Event.trigger("sally_connect", {"doc": doc, "instance": JOBADInstance});
                  });
             }
         }
