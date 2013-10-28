@@ -8,9 +8,16 @@
       $(map).find("area").each(function(idx, obj) {
         var partid = $(this).data("partid");
         if (partid == message.id) {
+          var coords = $(obj).attr("coords").split(",");
+          var offset = $(img).offset()
+          console.log(coords);
+          console.log(offset);
+          var top = Math.max(0, offset.top + parseInt(coords[1])-500);
+          var left = Math.max(0, offset.left + parseInt(coords[0])-500);
           $(obj).mapster('select');
           $('html, body').animate({
-            scrollTop: $(img).offset().top
+            scrollTop: top,
+            scrollLeft: left
           });
         }
       });
@@ -19,7 +26,6 @@
 
   function createDoc(img, docName) {
     var map = $($(img).attr("usemap"));
-
     var asm = new sally.SketchASM
 
     $(map).find("area").each(function(idx, obj) {
@@ -54,6 +60,7 @@
       });
 
     });
+    console.log("mapsterizing"+docName);
 
     $(img).mapster({
       stroke: true,

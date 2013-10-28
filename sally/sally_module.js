@@ -47,8 +47,10 @@
                         $(this).css("top", message.position.y).css("left", message.position.x); 
                     }
                 },
-                width: message.sizeX,
-                height: message.sizeY,
+//                width: message.sizeX,
+//                height: message.sizeY,
+                width: 450,
+                height: 330,
                 close: function() {
                     $(divStyle).empty();
                 }
