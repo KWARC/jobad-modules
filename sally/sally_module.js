@@ -1,10 +1,13 @@
 (function($){
+    var loadingMessage = "Loading Sally items";
+
+    var moduleURL = JOBAD.util.getCurrentOrigin();
+
     var _connected = false;
 
     var letUserChoose = function (_message) {
         var message = unserialize(_message);
-        var menus = {};
-
+        console.log(message);
         function execService(service) {
             return function() {
                 var choice = new sally.SallyFrameChoice;
@@ -15,23 +18,29 @@
             }
         }
 
-        for (var i=0; i<message.frames.length; i++) {
-            var frame = message.frames[i];
-            var frameName = frame.frameName; 
-            menus[frameName] = {};
-            for (var j=0; j<frame.frameServices.length; ++j) {
-                var service = frame.frameServices[j];
-                var servFun = execService(service);
-                menus[frameName][service.name] = servFun;
+        var status = JOBAD.UI.ContextMenu.updateMenu(function(_menus) {
+            var menus = [];
+            for (var i=0; i<_menus.length; ++i) {
+                if (_menus[i][0]==loadingMessage) {
+                    continue;
+                }
+                menus.push(_menus[i]);
             }
-        }
+            for (var i=0; i<message.frames.length; i++) {
+                var frame = message.frames[i];
+                var frameName = frame.frameName; 
+                var cFrame = [];
+                for (var j=0; j<frame.frameServices.length; ++j) {
+                    var service = frame.frameServices[j];
+                    var servFun = execService(service);
 
-        JOBAD.UI.ContextMenu.enable($("#wheel"), function() {
+                    cFrame.push([service.name, servFun]);
+                }
+                menus.push([frameName, cFrame]);
+            }
+
             return menus;
-        }, {});
-        setTimeout(function() {
-            $("#wheel").trigger("contextmenu.JOBAD.UI.ContextMenu");
-        }, 100);
+        });
     }
 
 
@@ -40,6 +49,7 @@
             var message = unserialize(_message);
             var frame = $("<iframe>").attr("src", message.url).attr("style", "width: 100%; height: 100%;");
             var divStyle = $("<div>").attr("style", "width: 100%; height: 100%;").append(frame);
+            console.log($(divStyle));
             $(divStyle).dialog({
                 title: message.title,
                 position: {
@@ -47,10 +57,8 @@
                         $(this).css("top", message.position.y).css("left", message.position.x); 
                     }
                 },
-//                width: message.sizeX,
-//                height: message.sizeY,
-                width: 450,
-                height: 330,
+                width: message.sizeX,
+                height: message.sizeY,
                 close: function() {
                     $(divStyle).empty();
                 }
@@ -70,23 +78,11 @@
                     var whoami = new sally.WhoAmI;
                     whoami.clientType = sally.WhoAmI.ClientType.Alex;
                     whoami.environmentType = sally.WhoAmI.EnvironmentType.Web;
-                    whoami.documentType = sally.WhoAmI.DocType.Sketch;
+                    whoami.documentType = sally.DocType.Sketch;
                     $.cometd.publish('/service/theo/register', serialize(whoami));
-        
                     JOBADInstance.Event.trigger("sally_connect", {"doc": doc, "instance": JOBADInstance});
                  });
             }
-        }
-    }
-
-    function initCometD(url, doc, JOBADInstance) {
-        return function() {
-            var cometURL = url+"cometd";
-            $.cometd.configure({ url: cometURL, logLevel: 'info' });
-
-            $.cometd.addListener('/meta/handshake', _handshakeWrapper(doc, JOBADInstance));
-
-            $.cometd.handshake();
         }
     }
 
@@ -97,9 +93,21 @@
             'author':   'Constantin Jucovschi',
             'description':  'A generic module enabling connection with Semantic Alliance Framework.',
             'hasCleanNamespace': true,
+            'externals' : {
+                js: ["sally.js", "common.js"]
+            }
         },        
         init: function(JOBADInstance, url, doc){
-            JOBAD.util.loadExternalJS(url+"sally/alex_boot.js", initCometD(url, doc, JOBADInstance));
-        },
+            this.globalStore.set("sally_load_message", loadingMessage);
+
+            var cometURL = url+"cometd";
+            $.cometd.configure({ url: cometURL, logLevel: 'info' });
+
+            $.cometd.addListener('/meta/handshake', _handshakeWrapper(doc, JOBADInstance));
+
+            $.cometd.handshake();
+
+        }
+
     });
 })(JOBAD.refs.$);
